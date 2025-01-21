@@ -11,3 +11,9 @@ Nesta etapa, o objetivo é preparar os dados para análise, garantindo que estej
 - Normalização do banco de dados: Ajustes no esquema de dados para eliminar redundâncias e garantir integridade.
 - Transformação de data de nascimento em idade: Extração do número correspondente à idade de cada pessoa.
 - Criação de categorias de atraso: Inclusão de um parâmetro categórico que identifica registros com atraso em alguma fatura, facilitando futuras análises.
+
+### Instalando os recursos necessários
+- Criar ambiente virtual utilizando python -m venv NomeAmbiente
+- Iniciar o ambiente .NomeAmbiente\Scripts\activate
+- Arquivo requeriments.txt possue todas as bibliotecas e versões necessárias
+- Utilizar o comando python -r .\requeriments.txt no prompt de comando
