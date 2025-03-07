@@ -13,3 +13,4 @@ streamlit==1.32.1
 matplotlib==3.8.3
 seaborn==0.13.2
 lime==0.2.0.1
+Boto3==1.37.7

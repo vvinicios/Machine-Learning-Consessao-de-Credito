@@ -5,32 +5,41 @@ import joblib
 import yaml
 import psycopg2
 import const
+import boto3
+from io import StringIO
 
 # Conexao com banco de dados
-def fetch_data_from_db(sql_query):
+def fetch_data_from_db():
     try:
+        # Abrir o arquivo de configuração
         with open('config.yaml', 'r') as file:
             config = yaml.safe_load(file)
 
-        con = psycopg2.connect(
-            dbname=config['database_config']['dbname'], 
-            user=config['database_config']['user'], 
-            password=config['database_config']['password'], 
-            host=config['database_config']['host']
+        # Acessar as credenciais e dados de configuração
+        aws_access_key = config['database_config']['aws_access_key']
+        aws_secret_key = config['database_config']['aws_secret_key']
+        bucket_name = config['database_config']['bucket_name']
+        file_key = config['database_config']['file_key']
+        
+        # Conectar ao S3
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=aws_access_key,
+            aws_secret_access_key=aws_secret_key,
+            region_name='sa-east-1'  # Ou a região do seu bucket S3
         )
 
-        cursor = con.cursor()
-        cursor.execute(sql_query)
+        # Obter o objeto do S3
+        obj = s3_client.get_object(Bucket=bucket_name, Key=file_key)
 
-        df = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
+        # Ler o conteúdo do arquivo CSV para um DataFrame
+        df = pd.read_csv(StringIO(obj['Body'].read().decode('utf-8')))
 
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'con' in locals():
-            con.close()
+        return df
 
-    return df
+    except Exception as e:
+        print(f"Erro ao conectar com AWS S3: {e}")
+        return None
 
 # Funcao para substituir registros nulos
 def substitui_nulos(df):
