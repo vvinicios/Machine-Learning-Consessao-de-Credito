@@ -60,12 +60,24 @@ def corrigir_erros_digitacao(df, coluna, lista_valida):
             correcao = process.extractOne(valor_str, lista_valida)[0]
             df.at[i, coluna] = correcao
 
+# Contar outliers
+def contar_outliers(data, column):
+    Q1 = data[column].quantile(0.25)
+    Q3 = data[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    outliers = data[(data[column] < lower_bound) | (data[column] > upper_bound)]
+    return len(outliers)
+
 # Tratar outliers
 def tratar_outliers(df, coluna, minimo, maximo):
     mediana = df[(df[coluna] >= minimo) & (df[coluna] <= maximo)][coluna].median()
     df[coluna] = df[coluna].apply(lambda x: mediana if x < minimo or x > maximo else x)
     return df
 
+#
 def save_scalers(df, nome_colunas):
     for nome_coluna in nome_colunas:
         scaler = StandardScaler()
