@@ -41,25 +41,6 @@ def fetch_data_from_db():
         print(f"Erro ao conectar com AWS S3: {e}")
         return None
 
-# Funcao para substituir registros nulos
-def substitui_nulos(df):
-    for coluna in df.columns:
-        if df[coluna].dtype == 'object':
-            moda = df[coluna].mode()[0]
-            df[coluna].fillna(moda, inplace=True)
-        else:
-            mediana = df[coluna].median()
-            df[coluna].fillna(mediana, inplace=True)
-
-# Corrigir erros de digitacao 
-def corrigir_erros_digitacao(df, coluna, lista_valida):
-    for i, valor in enumerate(df[coluna]):
-        valor_str = str(valor) if pd.notnull(valor) else valor
-
-        if valor_str not in lista_valida and pd.notnull(valor_str):
-            correcao = process.extractOne(valor_str, lista_valida)[0]
-            df.at[i, coluna] = correcao
-
 # Contar outliers
 def contar_outliers(data, column):
     Q1 = data[column].quantile(0.25)
@@ -77,7 +58,7 @@ def tratar_outliers(df, coluna, minimo, maximo):
     df[coluna] = df[coluna].apply(lambda x: mediana if x < minimo or x > maximo else x)
     return df
 
-#
+# Save scalers
 def save_scalers(df, nome_colunas):
     for nome_coluna in nome_colunas:
         scaler = StandardScaler()
@@ -86,6 +67,7 @@ def save_scalers(df, nome_colunas):
 
     return df
 
+# Save encoder
 def save_encoders(df, nome_colunas):
     for nome_coluna in nome_colunas:
         label_encoder = LabelEncoder()
@@ -93,6 +75,8 @@ def save_encoders(df, nome_colunas):
         joblib.dump(label_encoder, f"./objects/labelencoder{nome_coluna}.joblib")
 
     return df
- 
-            
 
+'''
+Criar função para aprofundamento na analise exploratória
+
+'''
